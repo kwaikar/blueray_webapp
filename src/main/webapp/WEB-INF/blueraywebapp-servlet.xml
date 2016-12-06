@@ -13,6 +13,9 @@
 
  
 
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+		
 	<context:annotation-config />
 	<context:component-scan base-package="edu.utd.security.blueraywebapp.*" />
 	<mvc:annotation-driven />

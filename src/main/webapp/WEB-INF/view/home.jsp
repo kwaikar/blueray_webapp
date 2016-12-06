@@ -1,7 +1,7 @@
 <%@ include file="include.jsp"%>
 <html>
 <head>
-<title>KWIC Indexing System</title>
+<title>BlueRay : Fine Grain Access Control System</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
@@ -26,16 +26,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#searchResults').DataTable();
-
-		$("#prefix").autocomplete({
-			headers : {
-				Accept : 'application/json'
-			},
-			source : "autocomplete",
-			minLength : 1
-		});
-
+ 
+	 
 	});
 </script>
 <head>
@@ -52,8 +44,11 @@
 				</div>
 			</c:if>
 		</div>
+<div align="right">
+						<a href="logout">logout</a>&nbsp;
+					</div>
 		<div class="panel-body">
-			<c:if test="${user==null}">
+			<c:if test="${userName==null}">
 
 				<div class="panel panel-info center"
 					style="width: 400px; text-align: center; margin-top: 50px">
@@ -91,12 +86,50 @@
 				</div>
 			</c:if>
 
-			<c:if test="${user!=null}">
-				<div class="panel-heading">Output of Source code</div>
-				<div class="panel-body">
-	<div style="text-align:left">${output }</div> 
+			<c:if test="${userName!=null}">
+
+				<div class="panel panel-info center"
+					style="width: 840px; text-align: center; margin-top: 50px">
+					<div class="panel-heading">Execute Program on Apache Spark Cluster</div>
+						
+					<div class="panel-body">
+						<form method="POST" name="fileUploadForm" id="fileUploadForm"
+							action="upload" enctype="multipart/form-data">
+							<div class="row" style="text-align: left">
+								<div class="col-xs-3">Main Class Name</div>
+								<div class="col-xs-9">
+									<input name="className" name="className" type="text" />
+								</div>
+							</div>
+							<div class="row" style="text-align: left;padding-top:10px">
+								<div class="col-xs-3">Jar File:</div>
+								<div class="col-xs-9">
+								<label class="btn btn-default btn-file">
+    <u>Browse Jar</u> <input type="file" name="multipartFile" id="multipartFile"  />
+</label>
+								
+									
+								</div>
+							</div>
+
+							<div class="row" style="text-align: right;padding-top:10px">
+								<div class="col-xs-12" style="text-align: right">
+									<input type="submit" value="Run Spark Code" class="btn btn-info" />
+									
+									
+								</div>
+							</div>
+						</form>
+						<c:if test="${output!=null}">
+							<div class="row" style="text-align: left;padding-top:10px">
+							 
+								<div class="col-xs-12">${output}</div></div>
+						</c:if>
+					</div>
 				</div>
 			</c:if>
-		</div></div>
+		</div>
+
+	</div>
 </body>
 </html>

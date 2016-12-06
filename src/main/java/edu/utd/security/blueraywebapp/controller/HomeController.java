@@ -1,6 +1,7 @@
 package edu.utd.security.blueraywebapp.controller;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import edu.utd.security.blueraywebapp.common.LoginBean;
@@ -35,8 +37,6 @@ public class HomeController {
 
 				String dataRead = null;
 
-				
-				
 				request.setAttribute("message", message);
 			}
 		}
@@ -46,19 +46,15 @@ public class HomeController {
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public ModelAndView search(ModelMap model, HttpServletRequest request, @RequestParam String prefix) {
 
-		System.out.println(":Request received: "+prefix);
-		Set<InputBean> results =searchService.select(prefix);
-		System.out.println(":results received: "+results);
-		if(results.size()>0)
-		{
-			request.setAttribute("searchResults", results);	
-		}
-		else
-		{
+		System.out.println(":Request received: " + prefix);
+		Set<InputBean> results = searchService.select(prefix);
+		System.out.println(":results received: " + results);
+		if (results.size() > 0) {
+			request.setAttribute("searchResults", results);
+		} else {
 			request.setAttribute("message", "* No Search Results found");
 		}
-			
-		
+
 		return new ModelAndView("home");
 	}
 
@@ -90,43 +86,60 @@ public class HomeController {
 		System.out.println("loginBean= " + loginBean);
 
 		if (loginBean.getUserName().equals("kanchan") && loginBean.getPassword().equalsIgnoreCase("utd123")) {
-			request.getSession().setAttribute("user", loginBean);
-			model.addAttribute("userName", loginBean.getUserName());
-			request.setAttribute("output", executeProcess(loginBean.getUserName().trim()));
-		 
-			return new ModelAndView("home");
-
+			request.getSession().setAttribute("userName", loginBean.getUserName());
 		} else if (loginBean.getUserName().equals("admin") && loginBean.getPassword().equalsIgnoreCase("utd123")) {
-			request.getSession().setAttribute("user", loginBean);
-			model.addAttribute("userName", loginBean.getUserName());
-			request.setAttribute("output", executeProcess(loginBean.getUserName().trim()));
-
-			
-		}return new ModelAndView("home");
-
+			request.getSession().setAttribute("userName", loginBean.getUserName());
+		}
+		return new ModelAndView("home");
 
 	}
 
-	public String executeProcess(String user)
-	{
+	@RequestMapping(value = "/upload", method = RequestMethod.POST)
+	public ModelAndView login(ModelMap model, HttpServletRequest request, @RequestParam String className,
+			@RequestParam MultipartFile multipartFile) {
+
+		System.out.println("className" + className);
+		if (multipartFile != null) {
+			try {
+				String fileName = "/tmp/" + System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
+				System.out.println(fileName);
+
+				multipartFile.transferTo(new File(fileName));
+				request.setAttribute("output",
+						executeProcess(request.getSession().getAttribute("userName").toString(), className, fileName));
+				System.out.println("File deletion status :"+new File(fileName).delete());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return new ModelAndView("home");
+	}
+
+	public String executeProcess(String user, String className, String fileName) {
 		Process p;
 		StringBuilder out = new StringBuilder();
 		try {
-			p = Runtime.getRuntime().exec("java -classpath /driver:/usr/lib/spark-2.0.0-bin-hadoop2.7/conf/:/usr/lib/spark-2.0.0-bin-hadoop2.7/jars/*:/home/kanchan/workspace2/blueray/target/blueray-0.0.8-SNAPSHOT.jar -javaagent:/home/kanchan/Downloads/aspectjweaver-1.8.5.jar  -Xmx1g org.apache.spark.deploy.SparkSubmit --master local[1] --class BlueRayTest  --verbose /home/kanchan/workspace2/BlueRayTest/target/BlueRayTest-0.0.1-SNAPSHOT.jar "+user);
+			String command = "java -classpath /driver:/usr/lib/spark-2.0.0-bin-hadoop2.7/conf/:/usr/lib/spark-2.0.0-bin-hadoop2.7/jars/*:/home/kanchan/workspace2/blueray/target/blueray-0.0.9-SNAPSHOT.jar -javaagent:/home/kanchan/Downloads/aspectjweaver-1.8.5.jar  -Xmx1g org.apache.spark.deploy.SparkSubmit --master local[1] --class "
+					+ className + "  --verbose " + fileName + " " + user;
+			System.out.println("Executing command : \n"+command);
+			p = Runtime.getRuntime()
+					.exec(command);
 			p.waitFor();
-			BufferedReader reader =
-                            new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			String line = "";
-			while ((line = reader.readLine())!= null) {
-				out.append(line+"</br>");
+			while ((line = reader.readLine()) != null) {
+				out.append(line + "</br>");
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Setting" + out.toString());
 		return out.toString();
 	}
+
 	/**
 	 * This method logs user out
 	 * 
