@@ -120,7 +120,7 @@ public class HomeController {
 		Process p;
 		StringBuilder out = new StringBuilder();
 		try {
-			String command = "java -classpath /driver:/usr/lib/spark-2.0.0-bin-hadoop2.7/conf/:/usr/lib/spark-2.0.0-bin-hadoop2.7/jars/*:/home/kanchan/workspace2/blueray/target/blueray-0.0.9-SNAPSHOT.jar -javaagent:/home/kanchan/Downloads/aspectjweaver-1.8.5.jar  -Xmx1g org.apache.spark.deploy.SparkSubmit --master local[1] --class "
+			String command ="/usr/lib/spark-2.0.2-bin-hadoop2.7"+File.separator+"bin"+File.separator+"spark-submit --master local[1] --class "
 					+ className + "  --verbose " + fileName + " " + user;
 			System.out.println("Executing command : \n"+command);
 			p = Runtime.getRuntime()

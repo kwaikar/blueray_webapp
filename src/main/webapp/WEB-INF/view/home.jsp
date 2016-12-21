@@ -44,9 +44,11 @@
 				</div>
 			</c:if>
 		</div>
+			<c:if test="${userName!=null}">
 <div align="right">
 						<a href="logout">logout</a>&nbsp;
 					</div>
+					</c:if>
 		<div class="panel-body">
 			<c:if test="${userName==null}">
 
@@ -114,7 +116,7 @@
 
 							<div class="row" style="text-align: right;padding-top:10px">
 								<div class="col-xs-12" style="text-align: right">
-									<input type="submit" value="Run Spark Code" class="btn btn-info" />
+									<input type="submit" value="Run Code on Spark Cluster" class="btn btn-info" />
 									
 									
 								</div>
