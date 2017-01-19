@@ -50,98 +50,104 @@ public class HomeController {
 		}
 		return new ModelAndView("home");
 	}
-	@RequestMapping(value = "/policies", method = RequestMethod.GET, headers = "Accept=*/*")
-	public @ResponseBody String autocomplete(@RequestParam String filePath,@RequestParam String priviledge, HttpServletRequest request,
-			@RequestParam String term) {
 
-	return	policiesService.getPolicy(filePath,priviledge);
-		
+	@RequestMapping(value = "/policies", method = RequestMethod.GET, headers = "Accept=*/*")
+	public @ResponseBody String autocomplete(@RequestParam String filePath, @RequestParam String priviledge,
+			HttpServletRequest request) {
+
+		return policiesService.getPolicy(filePath, priviledge);
+
 	}
 
-	
-	
 	/**
-	 *  // val logger = Logger(LoggerFactory.getLogger(this.getClass))
-  var policies: HashMap[String, HashSet[Policy]] = new scala.collection.mutable.HashMap
-  var policiesLoaded = false;
-  loadDefaultPolicy();
-  def loadDefaultPolicy()
-  {
-    enforcePolicy(new Policy(sys.env("BLUERAY_POLICIES_PATH"),Util.encrypt( Util.getSC().sparkUser), "zxasdsxccsdcsd"));
-  }
-  def enforcePolicy(policy: Policy) {
-    policy.priviledge = Util.decrypt(policy.priviledge)
-    var policiesSet: HashSet[Policy] = if (policies.get(policy.resourcePath) != None) (policies.get(policy.resourcePath).get) else (new HashSet[Policy]);
-    policiesSet.add(policy)
-    println("Added policy:" + policy);
-    policies.put(policy.resourcePath, policiesSet)
-  }
-  def deRegisterPolicy(policy: Policy) {
-    var policiesSet: Option[HashSet[Policy]] = policies.get(policy.resourcePath)
-    if (policiesSet != None) {
-      for (entry <- policiesSet.get) {
-        if (entry.regex.equalsIgnoreCase(policy.regex) && entry.resourcePath.equalsIgnoreCase(policy.resourcePath) && entry.regex.equalsIgnoreCase(policy.regex)) {
-          policiesSet.get.remove(entry)
-          if (policiesSet.get.size > 0) {
-            policies.put(policy.resourcePath, policiesSet.get);
-          } else {
-            policies.remove(entry.resourcePath)
-          }
-        }
-      }
-    }
-    println("Policies deregistered:" + policies)
-  }
-  def loadPolicies() {
-    if (!policiesLoaded) {
-      println("Reading policies from path : " + sys.env("BLUERAY_POLICIES_PATH"))
-      val lines = Util.getSC().textFile(sys.env("BLUERAY_POLICIES_PATH")).collect().toArray;
-      lines.foreach(println);
-      for (line <- lines) {
-
-        val arr = line.split(",");
-        var regex = arr(0);
-        if (arr(0).startsWith("\"")) {
-          regex = arr(0).replaceAll("\"", "");
-        }
-        println("Final: " + arr(0) + " : " + regex);
-        enforcePolicy(new Policy(arr(2), Util.encrypt(arr(1)), regex));
-      }
-      println("Policies read");
-      policiesLoaded = true;
-    }
-  }
-  def getPolicy(path: String, priviledgeRestriction: Option[String]): Option[Policy] =
-    {
-      println("going through======================"+path);
-      loadPolicies();
-        var policyToBeReturned: Option[Policy] = None;
-
-        for (hashSet <- policies) {
-          breakable {
-            //println("path.trim:" + path.trim())
-            if (hashSet._1.startsWith(path.trim())) {
-              if (priviledgeRestriction == None) {
-                // println("policyToBeReturned:" + "New")
-                return Some(new Policy(path, "", ""))
-              }
-              for (policy <- hashSet._2) {
-                if (policy.priviledge.equalsIgnoreCase(priviledgeRestriction.get)) {
-                  policyToBeReturned = Some(policy);
-                  //  println("policyToBeReturned:" + policyToBeReturned)
-                  break;
-                }
-              }
-              //println("returning some")
-              return Some(new Policy(path, "", ""))
-            }
-          }
-        }
-        println("Returning policy" + policyToBeReturned)
-        return policyToBeReturned
-    }*/
-	
-	
+	 * // val logger = Logger(LoggerFactory.getLogger(this.getClass))
+	 * var policies: HashMap[String, HashSet[Policy]] = new
+	 * scala.collection.mutable.HashMap
+	 * var policiesLoaded = false;
+	 * loadDefaultPolicy();
+	 * def loadDefaultPolicy()
+	 * {
+	 * enforcePolicy(new Policy(sys.env("BLUERAY_POLICIES_PATH"),Util.encrypt(
+	 * Util.getSC().sparkUser), "zxasdsxccsdcsd"));
+	 * }
+	 * def enforcePolicy(policy: Policy) {
+	 * policy.priviledge = Util.decrypt(policy.priviledge)
+	 * var policiesSet: HashSet[Policy] = if (policies.get(policy.resourcePath)
+	 * != None) (policies.get(policy.resourcePath).get) else (new
+	 * HashSet[Policy]);
+	 * policiesSet.add(policy)
+	 * println("Added policy:" + policy);
+	 * policies.put(policy.resourcePath, policiesSet)
+	 * }
+	 * def deRegisterPolicy(policy: Policy) {
+	 * var policiesSet: Option[HashSet[Policy]] =
+	 * policies.get(policy.resourcePath)
+	 * if (policiesSet != None) {
+	 * for (entry <- policiesSet.get) {
+	 * if (entry.regex.equalsIgnoreCase(policy.regex) &&
+	 * entry.resourcePath.equalsIgnoreCase(policy.resourcePath) &&
+	 * entry.regex.equalsIgnoreCase(policy.regex)) {
+	 * policiesSet.get.remove(entry)
+	 * if (policiesSet.get.size > 0) {
+	 * policies.put(policy.resourcePath, policiesSet.get);
+	 * } else {
+	 * policies.remove(entry.resourcePath)
+	 * }
+	 * }
+	 * }
+	 * }
+	 * println("Policies deregistered:" + policies)
+	 * }
+	 * def loadPolicies() {
+	 * if (!policiesLoaded) {
+	 * println("Reading policies from path : " +
+	 * sys.env("BLUERAY_POLICIES_PATH"))
+	 * val lines =
+	 * Util.getSC().textFile(sys.env("BLUERAY_POLICIES_PATH")).collect().toArray;
+	 * lines.foreach(println);
+	 * for (line <- lines) {
+	 * val arr = line.split(",");
+	 * var regex = arr(0);
+	 * if (arr(0).startsWith("\"")) {
+	 * regex = arr(0).replaceAll("\"", "");
+	 * }
+	 * println("Final: " + arr(0) + " : " + regex);
+	 * enforcePolicy(new Policy(arr(2), Util.encrypt(arr(1)), regex));
+	 * }
+	 * println("Policies read");
+	 * policiesLoaded = true;
+	 * }
+	 * }
+	 * def getPolicy(path: String, priviledgeRestriction: Option[String]):
+	 * Option[Policy] =
+	 * {
+	 * println("going through======================"+path);
+	 * loadPolicies();
+	 * var policyToBeReturned: Option[Policy] = None;
+	 * for (hashSet <- policies) {
+	 * breakable {
+	 * //println("path.trim:" + path.trim())
+	 * if (hashSet._1.startsWith(path.trim())) {
+	 * if (priviledgeRestriction == None) {
+	 * // println("policyToBeReturned:" + "New")
+	 * return Some(new Policy(path, "", ""))
+	 * }
+	 * for (policy <- hashSet._2) {
+	 * if (policy.priviledge.equalsIgnoreCase(priviledgeRestriction.get)) {
+	 * policyToBeReturned = Some(policy);
+	 * // println("policyToBeReturned:" + policyToBeReturned)
+	 * break;
+	 * }
+	 * }
+	 * //println("returning some")
+	 * return Some(new Policy(path, "", ""))
+	 * }
+	 * }
+	 * }
+	 * println("Returning policy" + policyToBeReturned)
+	 * return policyToBeReturned
+	 * }
+	 */
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public ModelAndView search(ModelMap model, HttpServletRequest request, @RequestParam String prefix) {
@@ -151,7 +157,8 @@ public class HomeController {
 		System.out.println(":results received: " + results);
 		if (results.size() > 0) {
 			request.setAttribute("searchResults", results);
-		} else {
+		}
+		else {
 			request.setAttribute("message", "* No Search Results found");
 		}
 
@@ -187,7 +194,8 @@ public class HomeController {
 
 		if (loginBean.getUserName().equals("kanchan") && loginBean.getPassword().equalsIgnoreCase("utd123")) {
 			request.getSession().setAttribute("userName", loginBean.getUserName());
-		} else if (loginBean.getUserName().equals("admin") && loginBean.getPassword().equalsIgnoreCase("utd123")) {
+		}
+		else if (loginBean.getUserName().equals("admin") && loginBean.getPassword().equalsIgnoreCase("utd123")) {
 			request.getSession().setAttribute("userName", loginBean.getUserName());
 		}
 		return new ModelAndView("home");
@@ -207,8 +215,9 @@ public class HomeController {
 				multipartFile.transferTo(new File(fileName));
 				request.setAttribute("output",
 						executeProcess(request.getSession().getAttribute("userName").toString(), className, fileName));
-				System.out.println("File deletion status :"+new File(fileName).delete());
-			} catch (Exception e) {
+				System.out.println("File deletion status :" + new File(fileName).delete());
+			}
+			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -220,11 +229,10 @@ public class HomeController {
 		Process p;
 		StringBuilder out = new StringBuilder();
 		try {
-			String command ="/usr/lib/spark-2.0.2-bin-hadoop2.7"+File.separator+"bin"+File.separator+"spark-submit --master local[1] --class "
-					+ className + "  --verbose " + fileName + " " + user;
-			System.out.println("Executing command : \n"+command);
-			p = Runtime.getRuntime()
-					.exec(command);
+			String command = System.getenv("SPARK_SUBMIT_COMMAND") + " " + className + "  --verbose " + fileName + " "
+					+ user;
+			System.out.println("Executing command : \n" + command);
+			p = Runtime.getRuntime().exec(command);
 			p.waitFor();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -233,7 +241,8 @@ public class HomeController {
 				out.append(line + "</br>");
 			}
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("Setting" + out.toString());

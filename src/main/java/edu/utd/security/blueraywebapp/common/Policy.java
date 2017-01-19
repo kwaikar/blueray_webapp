@@ -42,7 +42,7 @@ public class Policy {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		sb.append("\""+"filePath"+"\""+":"+"\""+filePath+"\",");
-		sb.append("\""+"regex"+"\""+":"+"\""+regex+"\",");
+		sb.append("\""+"regex"+"\""+":"+"\""+regex.replaceAll("\\\\", "\\\\\\\\")+"\",");
 		sb.append("\""+"priviledge"+"\""+":"+"\""+priviledge+"\"");
 		sb.append("}");
 		return sb.toString();

@@ -27,19 +27,17 @@ public class PoliciesServiceImpl {
 		allPolicies.addAll(set);
 		}
 		System.out.println("Are total number of policies found 5? :"+  ":"+ (allPolicies.size()==5));
-		System.out.println(service.getPolicy("hdfs://localhost/user", "kanchan"));
+		System.out.println(service.getPolicy("hdfs://localhost/user/user_all_phones.csv", "kanchan"));
 
 	}
 
 	public String getPolicy(String filePath, String priviledge) {
 		Policy policy = new Policy(filePath, "", "");
-
+		if (policies == null) {
+			loadPolicies();
+		}
 		if (!StringUtils.isEmptyOrWhitespaceOnly(filePath)) {
 			if (StringUtils.isEmptyOrWhitespaceOnly(priviledge)) {
-				if (policies == null) {
-					loadPolicies();
-				}
-				else {
 					for (String key : policies.keySet()) {
 						if (key.toLowerCase().startsWith(filePath)) {
 							/**
@@ -50,7 +48,6 @@ public class PoliciesServiceImpl {
 							return policy.toJson();
 						}
 					}
-				}
 			}
 			else {
 				/*
