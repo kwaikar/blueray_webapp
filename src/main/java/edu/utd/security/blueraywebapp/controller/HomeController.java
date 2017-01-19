@@ -51,7 +51,7 @@ public class HomeController {
 		return new ModelAndView("home");
 	}
 
-	@RequestMapping(value = "/policies", method = RequestMethod.GET, headers = "Accept=*/*")
+	@RequestMapping(value = "/policy", method = RequestMethod.GET, headers = "Accept=*/*")
 	public @ResponseBody String autocomplete(@RequestParam String filePath, @RequestParam String priviledge,
 			HttpServletRequest request) {
 
@@ -59,95 +59,29 @@ public class HomeController {
 
 	}
 
-	/**
-	 * // val logger = Logger(LoggerFactory.getLogger(this.getClass))
-	 * var policies: HashMap[String, HashSet[Policy]] = new
-	 * scala.collection.mutable.HashMap
-	 * var policiesLoaded = false;
-	 * loadDefaultPolicy();
-	 * def loadDefaultPolicy()
-	 * {
-	 * enforcePolicy(new Policy(sys.env("BLUERAY_POLICIES_PATH"),Util.encrypt(
-	 * Util.getSC().sparkUser), "zxasdsxccsdcsd"));
-	 * }
-	 * def enforcePolicy(policy: Policy) {
-	 * policy.priviledge = Util.decrypt(policy.priviledge)
-	 * var policiesSet: HashSet[Policy] = if (policies.get(policy.resourcePath)
-	 * != None) (policies.get(policy.resourcePath).get) else (new
-	 * HashSet[Policy]);
-	 * policiesSet.add(policy)
-	 * println("Added policy:" + policy);
-	 * policies.put(policy.resourcePath, policiesSet)
-	 * }
-	 * def deRegisterPolicy(policy: Policy) {
-	 * var policiesSet: Option[HashSet[Policy]] =
-	 * policies.get(policy.resourcePath)
-	 * if (policiesSet != None) {
-	 * for (entry <- policiesSet.get) {
-	 * if (entry.regex.equalsIgnoreCase(policy.regex) &&
-	 * entry.resourcePath.equalsIgnoreCase(policy.resourcePath) &&
-	 * entry.regex.equalsIgnoreCase(policy.regex)) {
-	 * policiesSet.get.remove(entry)
-	 * if (policiesSet.get.size > 0) {
-	 * policies.put(policy.resourcePath, policiesSet.get);
-	 * } else {
-	 * policies.remove(entry.resourcePath)
-	 * }
-	 * }
-	 * }
-	 * }
-	 * println("Policies deregistered:" + policies)
-	 * }
-	 * def loadPolicies() {
-	 * if (!policiesLoaded) {
-	 * println("Reading policies from path : " +
-	 * sys.env("BLUERAY_POLICIES_PATH"))
-	 * val lines =
-	 * Util.getSC().textFile(sys.env("BLUERAY_POLICIES_PATH")).collect().toArray;
-	 * lines.foreach(println);
-	 * for (line <- lines) {
-	 * val arr = line.split(",");
-	 * var regex = arr(0);
-	 * if (arr(0).startsWith("\"")) {
-	 * regex = arr(0).replaceAll("\"", "");
-	 * }
-	 * println("Final: " + arr(0) + " : " + regex);
-	 * enforcePolicy(new Policy(arr(2), Util.encrypt(arr(1)), regex));
-	 * }
-	 * println("Policies read");
-	 * policiesLoaded = true;
-	 * }
-	 * }
-	 * def getPolicy(path: String, priviledgeRestriction: Option[String]):
-	 * Option[Policy] =
-	 * {
-	 * println("going through======================"+path);
-	 * loadPolicies();
-	 * var policyToBeReturned: Option[Policy] = None;
-	 * for (hashSet <- policies) {
-	 * breakable {
-	 * //println("path.trim:" + path.trim())
-	 * if (hashSet._1.startsWith(path.trim())) {
-	 * if (priviledgeRestriction == None) {
-	 * // println("policyToBeReturned:" + "New")
-	 * return Some(new Policy(path, "", ""))
-	 * }
-	 * for (policy <- hashSet._2) {
-	 * if (policy.priviledge.equalsIgnoreCase(priviledgeRestriction.get)) {
-	 * policyToBeReturned = Some(policy);
-	 * // println("policyToBeReturned:" + policyToBeReturned)
-	 * break;
-	 * }
-	 * }
-	 * //println("returning some")
-	 * return Some(new Policy(path, "", ""))
-	 * }
-	 * }
-	 * }
-	 * println("Returning policy" + policyToBeReturned)
-	 * return policyToBeReturned
-	 * }
-	 */
+	@RequestMapping(value = "/policies", method = RequestMethod.GET, headers = "Accept=*/*")
+	public @ResponseBody String allPolicies(HttpServletRequest request) {
+
+		return policiesService.getAllPolicies().toString();
+
+	}
+	
+	@RequestMapping(value = "/enforcePolicy", method = RequestMethod.GET, headers = "Accept=*/*")
+	public @ResponseBody Boolean enforcePolicy(@RequestParam String filePath, @RequestParam String priviledge,@RequestParam String regex,
+			HttpServletRequest request) {
+
+		return policiesService.enforcePolicy(new Policy(filePath, regex,priviledge));
+
+	}
+ 
+	@RequestMapping(value = "/deregisterPolicy", method = RequestMethod.GET, headers = "Accept=*/*")
+	public @ResponseBody String deregisterPolicy(@RequestParam String filePath, @RequestParam String priviledge,@RequestParam String regex,
+			HttpServletRequest request) {
+
+		  policiesService.deregisterPolicy(new Policy(filePath, regex,priviledge));
+return "true";
+	}
+ 
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public ModelAndView search(ModelMap model, HttpServletRequest request, @RequestParam String prefix) {

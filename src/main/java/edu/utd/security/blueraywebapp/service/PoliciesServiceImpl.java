@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,11 +23,11 @@ public class PoliciesServiceImpl {
 	public static void main(String[] args) {
 		PoliciesServiceImpl service = new PoliciesServiceImpl();
 		service.loadPolicies();
-		Set<Policy>allPolicies = new HashSet<Policy>();
-		for(Set<Policy> set:service.policies.values()){
-		allPolicies.addAll(set);
+		Set<Policy> allPolicies = new HashSet<Policy>();
+		for (Set<Policy> set : service.policies.values()) {
+			allPolicies.addAll(set);
 		}
-		System.out.println("Are total number of policies found 5? :"+  ":"+ (allPolicies.size()==5));
+		System.out.println("Are total number of policies found 5? :" + ":" + (allPolicies.size() == 5));
 		System.out.println(service.getPolicy("hdfs://localhost/user/user_all_phones.csv", "kanchan"));
 
 	}
@@ -38,16 +39,16 @@ public class PoliciesServiceImpl {
 		}
 		if (!StringUtils.isEmptyOrWhitespaceOnly(filePath)) {
 			if (StringUtils.isEmptyOrWhitespaceOnly(priviledge)) {
-					for (String key : policies.keySet()) {
-						if (key.toLowerCase().startsWith(filePath)) {
-							/**
-							 * There exists some policy for this path, it means
-							 * that this path should be blocked completely.
-							 * empty regex means everything gets blocked.
-							 */
-							return policy.toJson();
-						}
+				for (String key : policies.keySet()) {
+					if (key.toLowerCase().startsWith(filePath)) {
+						/**
+						 * There exists some policy for this path, it means
+						 * that this path should be blocked completely.
+						 * empty regex means everything gets blocked.
+						 */
+						return policy.toString();
 					}
+				}
 			}
 			else {
 				/*
@@ -61,10 +62,10 @@ public class PoliciesServiceImpl {
 						 */
 						for (Policy currentPolicy : policies.get(key)) {
 							if (currentPolicy.getPriviledge().equalsIgnoreCase(priviledge)) {
-								return currentPolicy.toJson();
+								return currentPolicy.toString();
 							}
 						}
-						return policy.toJson();
+						return policy.toString();
 					}
 				}
 			}
@@ -76,7 +77,61 @@ public class PoliciesServiceImpl {
 			 */
 			return "";
 		}
-		return policy.toJson();
+		return policy.toString();
+	}
+
+	public Set<Policy> getAllPolicies() {
+		if(policies==null)
+		{
+			loadPolicies();
+		}
+		Set<Policy> allPolicies = new HashSet<Policy>();
+		for (Set<Policy> set : policies.values()) {
+			allPolicies.addAll(set);
+		}
+		return allPolicies;
+	}
+
+	public void deregisterPolicy(Policy policy) {
+		if (policies == null) {
+			loadPolicies();
+		}
+		String keyToBeRemoved = "";
+		for (String key : policies.keySet()) {
+			if (key.toLowerCase().startsWith(policy.getFilePath())) {
+				/**
+				 * There exists some policy for this path, get
+				 * appropriate policy for given priviledge.
+				 */
+				HashSet<Policy> newPolicies = new HashSet<Policy>();
+
+				for (Policy currentPolicy : policies.get(key)) {
+					if (!currentPolicy.getPriviledge().equalsIgnoreCase(policy.getPriviledge())) {
+						newPolicies.add(currentPolicy);
+					}
+				}
+				if (newPolicies.size() != 0) {
+					policies.put(key, newPolicies);
+				}
+				else {
+					keyToBeRemoved = key;
+				}
+			}
+		}
+		policies.remove(keyToBeRemoved);
+	}
+
+	public boolean enforcePolicy(Policy policy) {
+		if (policies == null) {
+			loadPolicies();
+		}
+		HashSet<Policy> policiesSet = policies.get(policy.getFilePath());
+		if (policiesSet == null) {
+			policiesSet = new HashSet<Policy>();
+		}
+		policiesSet.add(policy);
+		policies.put(policy.getFilePath(), policiesSet);
+		return true;
 	}
 
 	public void loadPolicies() {
@@ -94,13 +149,8 @@ public class PoliciesServiceImpl {
 					if (regex.startsWith("\"")) {
 						regex = regex.replaceAll("\"", "");
 					}
-					Policy policy =new Policy(arr[2], regex, arr[1]);
-					HashSet<Policy> policiesSet = policies.get(arr[2]);
-					if (policiesSet == null) {
-						policiesSet = new HashSet<Policy>();
-					}
-					policiesSet.add(policy);
-					policies.put(policy.getFilePath(),policiesSet);
+					Policy policy = new Policy(arr[2], regex, arr[1]);
+					enforcePolicy(policy);
 				}
 			}
 			catch (IOException e) {
