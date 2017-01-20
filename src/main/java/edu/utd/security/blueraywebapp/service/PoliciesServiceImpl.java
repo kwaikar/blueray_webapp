@@ -68,6 +68,7 @@ public class PoliciesServiceImpl {
 						return policy.toString();
 					}
 				}
+				return "No Policy";
 			}
 
 		}
