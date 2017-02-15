@@ -40,7 +40,7 @@ public class PoliciesServiceImpl {
 		if (!StringUtils.isEmptyOrWhitespaceOnly(filePath)) {
 			if (StringUtils.isEmptyOrWhitespaceOnly(priviledge)) {
 				for (String key : policies.keySet()) {
-					if (key.toLowerCase().startsWith(filePath)) {
+					if (key.toLowerCase().startsWith(filePath.toLowerCase())) {
 						/**
 						 * There exists some policy for this path, it means
 						 * that this path should be blocked completely.
@@ -55,11 +55,13 @@ public class PoliciesServiceImpl {
 				 * Priviledge is present,
 				 */
 				for (String key : policies.keySet()) {
-					if (key.toLowerCase().startsWith(filePath)) {
+					System.out.println("Checking :"+key);
+					if (key.toLowerCase().startsWith(filePath.toLowerCase())) {
 						/**
 						 * There exists some policy for this path, get
 						 * appropriate policy for given priviledge.
 						 */
+						System.out.println("policies.get(key)"+policies.get(key));
 						for (Policy currentPolicy : policies.get(key)) {
 							if (currentPolicy.getPriviledge().equalsIgnoreCase(priviledge)) {
 								return currentPolicy.toString();
@@ -99,7 +101,7 @@ public class PoliciesServiceImpl {
 		}
 		String keyToBeRemoved = "";
 		for (String key : policies.keySet()) {
-			if (key.toLowerCase().startsWith(policy.getFilePath())) {
+			if (key.toLowerCase().startsWith(policy.getFilePath().toLowerCase())) {
 				/**
 				 * There exists some policy for this path, get
 				 * appropriate policy for given priviledge.
