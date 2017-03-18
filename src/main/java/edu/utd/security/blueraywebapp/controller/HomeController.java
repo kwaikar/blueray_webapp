@@ -3,11 +3,6 @@ package edu.utd.security.blueraywebapp.controller;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,15 +19,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import edu.utd.security.blueraywebapp.common.LoginBean;
 import edu.utd.security.blueraywebapp.common.Policy;
-import edu.utd.security.blueraywebapp.service.InputBean;
 import edu.utd.security.blueraywebapp.service.PoliciesServiceImpl;
-import edu.utd.security.blueraywebapp.service.SearchServiceImpl;
 
 @Controller
 public class HomeController {
 
-	@Autowired
-	private SearchServiceImpl searchService = null;
 
 	@Autowired
 	private PoliciesServiceImpl policiesService = null;
@@ -73,7 +64,8 @@ public class HomeController {
 		return policiesService.enforcePolicy(new Policy(filePath, regex,priviledge));
 
 	}
- 
+	
+	 
 	@RequestMapping(value = "/deregisterPolicy", method = RequestMethod.GET, headers = "Accept=*/*")
 	public @ResponseBody String deregisterPolicy(@RequestParam String filePath, @RequestParam String priviledge,@RequestParam String regex,
 			HttpServletRequest request) {
@@ -82,40 +74,6 @@ public class HomeController {
 return "true";
 	}
  
-
-	@RequestMapping(value = "/search", method = RequestMethod.POST)
-	public ModelAndView search(ModelMap model, HttpServletRequest request, @RequestParam String prefix) {
-
-		System.out.println(":Request received: " + prefix);
-		Set<InputBean> results = searchService.select(prefix);
-		System.out.println(":results received: " + results);
-		if (results.size() > 0) {
-			request.setAttribute("searchResults", results);
-		}
-		else {
-			request.setAttribute("message", "* No Search Results found");
-		}
-
-		return new ModelAndView("home");
-	}
-
-	@RequestMapping(value = "/autocomplete", method = RequestMethod.GET, headers = "Accept=*/*")
-	public @ResponseBody List<String> autocomplete(ModelMap model, HttpServletRequest request,
-			@RequestParam String term) {
-
-		return searchService.autocomplete(term);
-	}
-
-	@RequestMapping(value = "/deleteIndex", method = RequestMethod.GET)
-	public ModelAndView deleteIndex(ModelMap model, HttpServletRequest request) {
-
-		request.getSession().removeAttribute("indexPresent");
-		searchService.deleteAll();
-		request.setAttribute("message", "Kwic Index was removed from the system");
-		request.removeAttribute("searchResults");
-		return new ModelAndView("home");
-	}
-
 	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	public ModelAndView home(ModelMap model, HttpServletRequest request, @ModelAttribute LoginBean loginBean) {
 		return new ModelAndView("home");

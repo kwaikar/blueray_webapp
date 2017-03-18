@@ -4,14 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
-
-import com.mysql.jdbc.StringUtils;
 
 import edu.utd.security.blueraywebapp.common.Policy;
 
@@ -20,25 +19,31 @@ public class PoliciesServiceImpl {
 
 	Map<String, HashSet<Policy>> policies = null;
 
-	public static void main(String[] args) {
-		PoliciesServiceImpl service = new PoliciesServiceImpl();
-		service.loadPolicies();
-		Set<Policy> allPolicies = new HashSet<Policy>();
-		for (Set<Policy> set : service.policies.values()) {
-			allPolicies.addAll(set);
-		}
-		System.out.println("Are total number of policies found 5? :" + ":" + (allPolicies.size() == 5));
-		System.out.println(service.getPolicy("hdfs://localhost/user/user_all_phones.csv", "kanchan"));
-
-	}
+	/*
+	 * public static void main(String[] args) {
+	 * PoliciesServiceImpl service = new PoliciesServiceImpl();
+	 * service.loadPolicies();
+	 * Set<Policy> allPolicies = new HashSet<Policy>();
+	 * for (Set<Policy> set : service.policies.values()) {
+	 * allPolicies.addAll(set);
+	 * }
+	 * System.out.println("Are total number of policies found 5? :" + ":" +
+	 * (allPolicies.size() == 5));
+	 * System.out.println(service.getPolicy(
+	 * "hdfs://localhost/user/user_all_phones.csv", "kanchan"));
+	 * System.out.println(service.getNumMatches("0,1,2,3,4", "0,1",
+	 * "38363.0_38363.0", "48.0_48.0"));
+	 * }
+	 */
+	 
 
 	public String getPolicy(String filePath, String priviledge) {
 		Policy policy = new Policy(filePath, "", "");
 		if (policies == null) {
 			loadPolicies();
 		}
-		if (!StringUtils.isEmptyOrWhitespaceOnly(filePath)) {
-			if (StringUtils.isEmptyOrWhitespaceOnly(priviledge)) {
+		if (!(filePath == null || filePath.trim().length() == 0)) {
+			if (priviledge == null || priviledge.trim().length() == 0) {
 				for (String key : policies.keySet()) {
 					if (key.toLowerCase().startsWith(filePath.toLowerCase())) {
 						/**
@@ -55,13 +60,13 @@ public class PoliciesServiceImpl {
 				 * Priviledge is present,
 				 */
 				for (String key : policies.keySet()) {
-					System.out.println("Checking :"+key);
+					System.out.println("Checking :" + key);
 					if (key.toLowerCase().startsWith(filePath.toLowerCase())) {
 						/**
 						 * There exists some policy for this path, get
 						 * appropriate policy for given priviledge.
 						 */
-						System.out.println("policies.get(key)"+policies.get(key));
+						System.out.println("policies.get(key)" + policies.get(key));
 						for (Policy currentPolicy : policies.get(key)) {
 							if (currentPolicy.getPriviledge().equalsIgnoreCase(priviledge)) {
 								return currentPolicy.toString();
@@ -84,8 +89,7 @@ public class PoliciesServiceImpl {
 	}
 
 	public Set<Policy> getAllPolicies() {
-		if(policies==null)
-		{
+		if (policies == null) {
 			loadPolicies();
 		}
 		Set<Policy> allPolicies = new HashSet<Policy>();
